@@ -30,17 +30,15 @@
         public int Score()
         {
             var score = 0;
-            for(int i = 0; i < 10; i++)
+            foreach(var frame in frames)
             {
-                var frame = frames[i];
-
                 if (frame.IsStrike)
                 {
-                    score += 10 + StrikeBonus(frame);
+                    score += 10 + GetStrikeBonus(frame);
                 }
                 else if (frame.IsSpare)
                 {
-                    score += 10 + SpareBonus(frame);
+                    score += 10 + GetSpareBonus(frame);
                 }
                 else
                 {
@@ -51,14 +49,14 @@
             return score;
         }     
 
-        private int SpareBonus(Frame frame)
+        private int GetSpareBonus(Frame frame)
         {
             return frame.FrameNumber == 9
                        ? frame.Rolls.Last()
                        : frames[frame.FrameNumber + 1].Rolls.First();
         }
 
-        private int StrikeBonus(Frame frame)
+        private int GetStrikeBonus(Frame frame)
         {
             if (frame.FrameNumber == 9)
             {
@@ -86,43 +84,3 @@
         }
     }    
 }
-
-
-
-//public int Score()
-//{
-//    var score = 0;
-
-//    for (int i = 0; i < frames.Count; i++)
-//    {
-//        var frame = frames[i];
-//        if (frame.IsSpare)
-//        {
-//            var nextFrame = frames[i + 1];
-//            score += frame.Rolls.Sum() + nextFrame.Rolls.First();
-//        }
-//        else if (frame.IsStrike)
-//        {
-//            score += 10;
-
-//            var nextFrame = frames[i + 1];
-//            if (nextFrame.IsStrike)
-//            {
-//                score += 10;
-//                var thirdFrame = frames[i + 2];
-//                score += thirdFrame.Rolls.First();
-//            }
-//            else
-//            {
-//                score += nextFrame.Rolls.Sum();
-//            }
-//            //score += frame.Rolls.Sum() + nextFrame.Rolls.Sum();
-//        }
-//        else
-//        {
-//            score += frame.Rolls.Sum();
-//        }
-//    }
-
-//    return score;
-//}
