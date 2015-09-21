@@ -27,7 +27,7 @@
             }
         }
 
-        public int Score()
+        public int GetScore()
         {
             var score = 0;
             foreach(var frame in frames)

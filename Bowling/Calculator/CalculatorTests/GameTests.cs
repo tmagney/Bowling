@@ -18,84 +18,47 @@
         [Test]
         public void RollAllZeros_ScoresZero()
         {
-            for (int i = 0; i < 20; i++)
-            {
-                sut.Roll(0);
-            }
+            RollMany(20, 0);
 
-            sut.Score().Should().Be(0);
+            sut.GetScore().Should().Be(0);
         }
 
         [Test]
         public void RollAllOnes_Scores20()
         {
-            for (int i = 0; i < 20; i++)
-            {
-                sut.Roll(1);
-            }
-
-            sut.Score().Should().Be(20);
+            RollMany(20, 1);
+            sut.GetScore().Should().Be(20);
         }
 
         [Test]
         public void RollSpareAndOnes_Scores29()
         {
             RollSpare();
-            for (int i = 0; i < 18; i++)
-            {
-                sut.Roll(1);
-            }
+            RollMany(18, 1);
 
-            sut.Score().Should().Be(29);
+            sut.GetScore().Should().Be(29);
         }
 
         [Test]
         public void RollStrikeAndOnes_Scores30()
         {
             sut.Roll(10);
-            for (int i = 0; i < 18; i++)
-            {
-                sut.Roll(1);
-            }
+            RollMany(18, 1);
 
-            sut.Score().Should().Be(30);
-        }
-
-        [Test]
-        public void RollThreeStrikesAndOnes_Scores77()
-        {
-            sut.Roll(10);
-            sut.Roll(10);
-            sut.Roll(10);
-
-            for (int i = 0; i < 14; i++)
-            {
-                sut.Roll(1);
-            }
-
-            sut.Score().Should().Be(77);
+            sut.GetScore().Should().Be(30);
         }
         
         [Test]
-        public void RollOnesThenSpareAndStrikeInTenthFrame_Scores38()
-        {
-            for (var i = 0; i < 18; i++)
-            {
-                sut.Roll(1);
-            }
-
-            RollSpare();
-            sut.Roll(10);
-
-            sut.Score().Should().Be(38);
-        }
-
-        [Test]
         public void PerfectGame_Scores300()
         {
-            for (var i = 0; i < 10; i++)
+            RollMany(10, 10);
+        }
+
+        private void RollMany(int rolls, int pins)
+        {
+            for (int i = 0; i < rolls; i++)
             {
-                sut.Roll(10);
+                sut.Roll(pins);
             }
         }
         
