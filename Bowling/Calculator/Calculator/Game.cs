@@ -5,68 +5,56 @@
 
     public class Game
     {
-        private int currentFrame = 0;
-        private readonly List<Frame> frames = new List<Frame>();
-
-        public Game()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                frames.Add(new Frame {FrameNumber = i});
-            }
-        }
-
+        private readonly List<int> rolls = new List<int>();
+        
         public void Roll(int pins)
         {
-            var frame = frames[currentFrame];
-            frame.Rolls.Add(pins);
+            rolls.Add(pins);
 
-            if ((frame.IsStrike || frame.Rolls.Count > 1) && frame.FrameNumber != 9)
+            if (pins == 10 && rolls.Count < 18 && rolls.Count%2 > 0)
             {
-                currentFrame++;
+                rolls.Add(0);
             }
         }
 
         public int GetScore()
         {
-            return frames.Sum(frame => frame.IsStrike 
-                ? 10 + GetStrikeBonus(frame) 
-                : frame.IsSpare 
-                    ? 10 + GetSpareBonus(frame) 
-                    : frame.Rolls.Sum());
+            var score = 0;
+
+            for (var i = 0; i < 10; i++)
+            {
+                var rollIndex = i*2;
+
+                score += IsSpare(rollIndex)
+                        ? 10 + GetSpareBonus(rollIndex)
+                        : IsStrike(rollIndex)
+                            ? 10 + GetStrikeBonus(rollIndex)
+                            : rolls.Skip(rollIndex).Take(2).Sum();
+            }
+
+            return score;
         }
 
-        private int GetSpareBonus(Frame frame)
+        private int GetSpareBonus(int index)
         {
-            return frame.FrameNumber == 9
-                       ? frame.Rolls.Last()
-                       : frames[frame.FrameNumber + 1].Rolls.First();
+            return rolls[index + 2];
         }
 
-        private int GetStrikeBonus(Frame frame)
+        private int GetStrikeBonus(int index)
         {
-            return frame.FrameNumber == 9
-                       ? frame.Rolls.Sum() - 10
-                       : frame.FrameNumber == 8
-                             ? frames[frame.FrameNumber + 1].Rolls.Take(2).Sum()
-                             : frames[frame.FrameNumber + 1].IsStrike
-                                   ? 10 + frames[frame.FrameNumber + 2].Rolls.First()
-                                   : frames[frame.FrameNumber + 1].Rolls.Sum();
+            return !IsStrike(index + 2)
+                       ? rolls.Skip(index + 2).Take(2).Sum()
+                       :  10 + rolls.Skip(index + 2).First();
         }
-    }
 
-    internal class Frame
-    {
-        public int FrameNumber { get; set; }
-        public List<int> Rolls { get; }
-
-        public bool IsSpare => !IsStrike && Rolls.Sum() == 10;
-
-        public bool IsStrike => Rolls.First() == 10;
-
-        public Frame()
+        public bool IsStrike(int index)
         {
-            Rolls = new List<int>();
+            return rolls[index] == 10 && index % 2 == 0;
+        }
+
+        public bool IsSpare(int index)
+        {
+            return !IsStrike(index) && rolls[index] + rolls[index + 1] == 10;
         }
     }    
 }
