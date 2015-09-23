@@ -20,8 +20,8 @@
         {
             var frame = frames[currentFrame];
             frame.Rolls.Add(pins);
-            
-            if (frame.IsStrike || frame.Rolls.Count > 1 && frame.FrameNumber != 9)
+
+            if ((frame.IsStrike || frame.Rolls.Count > 1) && frame.FrameNumber != 9)
             {
                 currentFrame++;
             }
@@ -29,25 +29,12 @@
 
         public int GetScore()
         {
-            var score = 0;
-            foreach(var frame in frames)
-            {
-                if (frame.IsStrike)
-                {
-                    score += 10 + GetStrikeBonus(frame);
-                }
-                else if (frame.IsSpare)
-                {
-                    score += 10 + GetSpareBonus(frame);
-                }
-                else
-                {
-                    score += frame.Rolls.Sum();
-                }
-            }
-
-            return score;
-        }     
+            return frames.Sum(frame => frame.IsStrike 
+                ? 10 + GetStrikeBonus(frame) 
+                : frame.IsSpare 
+                    ? 10 + GetSpareBonus(frame) 
+                    : frame.Rolls.Sum());
+        }
 
         private int GetSpareBonus(Frame frame)
         {
@@ -58,14 +45,13 @@
 
         private int GetStrikeBonus(Frame frame)
         {
-            if (frame.FrameNumber == 9)
-            {
-                return frame.Rolls.Sum() - 10;
-            }
-
-            return frames[frame.FrameNumber + 1].IsStrike
-                       ? 10 + frames[frame.FrameNumber + 2].Rolls.First()
-                       : frames[frame.FrameNumber + 1].Rolls.Sum();
+            return frame.FrameNumber == 9
+                       ? frame.Rolls.Sum() - 10
+                       : frame.FrameNumber == 8
+                             ? frames[frame.FrameNumber + 1].Rolls.Take(2).Sum()
+                             : frames[frame.FrameNumber + 1].IsStrike
+                                   ? 10 + frames[frame.FrameNumber + 2].Rolls.First()
+                                   : frames[frame.FrameNumber + 1].Rolls.Sum();
         }
     }
 
@@ -74,9 +60,9 @@
         public int FrameNumber { get; set; }
         public List<int> Rolls { get; }
 
-        public bool IsSpare => Rolls.Count == 2 && Rolls.Sum() == 10;
+        public bool IsSpare => !IsStrike && Rolls.Sum() == 10;
 
-        public bool IsStrike => Rolls.Count == 1 && Rolls.Sum() == 10;
+        public bool IsStrike => Rolls.First() == 10;
 
         public Frame()
         {

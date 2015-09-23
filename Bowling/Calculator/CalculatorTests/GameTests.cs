@@ -51,7 +51,8 @@
         [Test]
         public void PerfectGame_Scores300()
         {
-            RollMany(10, 10);
+            RollMany(12, 10);
+            sut.GetScore().Should().Be(300);
         }
 
         private void RollMany(int rolls, int pins)
